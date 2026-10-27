@@ -4,6 +4,10 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { db, schema } from "@/db";
 import { notFound } from "next/navigation";
+import {
+  CalendarGrid,
+  type CalendarDayData,
+} from "./calendar-grid";
 
 export default async function ParticipantPage({
   params,
@@ -27,6 +31,57 @@ export default async function ParticipantPage({
     .from(schema.calendarDays)
     .where(eq(schema.calendarDays.participantId, participant.id));
 
+  // Days existing in DB + placeholder cells for the always-present 25 slots.
+  const dayRows = await db
+    .select()
+    .from(schema.calendarDays)
+    .where(eq(schema.calendarDays.participantId, participant.id))
+    .orderBy(schema.calendarDays.day);
+  const dayByNumber = new Map(dayRows.map((row) => [row.day, row]));
+  const cells: CalendarDayData[] = Array.from({ length: 25 }, (_, index) => {
+    const day = index + 1;
+    const row = dayByNumber.get(day);
+    return row
+      ? {
+          day,
+          configured: true,
+          stitchId: row.stitchId,
+          yarnId: row.yarnId,
+          rows: row.rows,
+          tutoUrl: row.tutoUrl,
+          notes: row.notes,
+        }
+      : {
+          day,
+          configured: false,
+          stitchId: null,
+          yarnId: null,
+          rows: null,
+          tutoUrl: null,
+          notes: null,
+        };
+  });
+
+  // Reference lists for the editor selects (step 5 adds their CRUD).
+  const [stitchOptions, yarnOptions] = await Promise.all([
+    db
+      .select({
+        id: schema.stitches.id,
+        name: schema.stitches.name,
+        fixedRows: schema.stitches.fixedRows,
+      })
+      .from(schema.stitches)
+      .orderBy(schema.stitches.name),
+    db
+      .select({
+        id: schema.yarns.id,
+        name: schema.yarns.name,
+        colorHex: schema.yarns.colorHex,
+      })
+      .from(schema.yarns)
+      .orderBy(schema.yarns.name),
+  ]);
+
   return (
     <div className="grid gap-6">
       <div>
@@ -48,10 +103,14 @@ export default async function ParticipantPage({
         </p>
       </div>
 
-      {/* Placeholder until step 4: the 25-day grid goes here. */}
-      <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        La grille des 25 jours sera disponible à l&apos;étape suivante.
-      </div>
+      {/* The 25-day grid; clicking a cell opens the day editor dialog. */}
+      <CalendarGrid
+        participantId={participant.id}
+        participantName={participant.name}
+        days={cells}
+        stitches={stitchOptions}
+        yarns={yarnOptions}
+      />
     </div>
   );
 }
