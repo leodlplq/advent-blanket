@@ -117,6 +117,7 @@ export default async function ParticipantPage({
       <CalendarGrid
         participantId={participant.id}
         participantName={participant.name}
+        participantSlug={participant.slug}
         days={cells}
         stitches={stitchOptions}
         yarns={yarnOptions}

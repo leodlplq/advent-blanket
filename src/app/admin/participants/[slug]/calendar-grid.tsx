@@ -7,7 +7,7 @@ import {
   useTransition,
 } from "react";
 import { useFormStatus } from "react-dom";
-import { Check, Plus } from "lucide-react";
+import { Check, Eye, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -68,12 +68,14 @@ const initialDayState: DayActionState = {};
 export function CalendarGrid({
   participantId,
   participantName,
+  participantSlug,
   days,
   stitches,
   yarns,
 }: {
   participantId: number;
   participantName: string;
+  participantSlug: string;
   days: CalendarDayData[];
   stitches: StitchOption[];
   yarns: YarnOption[];
@@ -87,6 +89,7 @@ export function CalendarGrid({
           <DayCellTile
             key={cell.day}
             cell={cell}
+            participantSlug={participantSlug}
             stitchName={
               cell.stitchId != null
                 ? stitches.find((s) => s.id === cell.stitchId)?.name ?? null
@@ -108,6 +111,7 @@ export function CalendarGrid({
           key={selectedDay.day}
           participantId={participantId}
           participantName={participantName}
+          participantSlug={participantSlug}
           cell={selectedDay}
           stitches={stitches}
           yarns={yarns}
@@ -122,57 +126,72 @@ export function CalendarGrid({
 
 function DayCellTile({
   cell,
+  participantSlug,
   stitchName,
   yarn,
   onOpen,
 }: {
   cell: CalendarDayData;
+  participantSlug: string;
   stitchName: string | null;
   yarn: YarnOption | null;
   onOpen: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      aria-label={`Jour ${cell.day} — ${cell.configured ? "configuré" : "vide"}. Modifier.`}
-      className={cn(
-        "rounded-lg border p-2.5 text-left transition-colors",
-        cell.configured
-          ? "border-border bg-card hover:border-ring/50 hover:bg-accent/50"
-          : "border-dashed bg-transparent text-muted-foreground hover:bg-accent/30",
-      )}
-    >
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] font-medium tracking-wide text-muted-foreground">
-          Jour {cell.day}
-        </span>
-        {cell.configured ? (
-          <Check className="size-3 text-primary" aria-hidden />
-        ) : null}
-      </div>
-      <div
+    <div className="relative">
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`Jour ${cell.day} — ${cell.configured ? "configuré" : "vide"}. Modifier.`}
         className={cn(
-          "mt-1 truncate text-sm font-medium",
-          !cell.configured && "font-normal",
+          "w-full rounded-lg border p-2.5 text-left transition-colors",
+          cell.configured
+            ? "border-border bg-card hover:border-ring/50 hover:bg-accent/50"
+            : "border-dashed bg-transparent text-muted-foreground hover:bg-accent/30",
         )}
       >
-        {stitchName ?? "—"}
-      </div>
-      <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-        {yarn ? (
-          <span
-            className="size-2.5 shrink-0 rounded-full ring-1 ring-foreground/20"
-            style={{ backgroundColor: yarn.colorHex }}
-            aria-hidden
-          />
-        ) : null}
-        <span className="truncate">
-          {yarn ? yarn.name : "—"}
-          {cell.rows != null ? ` · ${cell.rows} rangs` : ""}
-        </span>
-      </div>
-    </button>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-medium tracking-wide text-muted-foreground">
+            Jour {cell.day}
+          </span>
+          {cell.configured ? (
+            <Check className="size-3 text-primary" aria-hidden />
+          ) : null}
+        </div>
+        <div
+          className={cn(
+            "mt-1 truncate text-sm font-medium",
+            !cell.configured && "font-normal",
+          )}
+        >
+          {stitchName ?? "—"}
+        </div>
+        <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+          {yarn ? (
+            <span
+              className="size-2.5 shrink-0 rounded-full ring-1 ring-foreground/20"
+              style={{ backgroundColor: yarn.colorHex }}
+              aria-hidden
+            />
+          ) : null}
+          <span className="truncate">
+            {yarn ? yarn.name : "—"}
+            {cell.rows != null ? ` · ${cell.rows} rangs` : ""}
+          </span>
+        </div>
+      </button>
+      {cell.configured ? (
+        <a
+          href={`/cal/${participantSlug}/${cell.day}`}
+          target="_blank"
+          rel="noopener"
+          aria-label={`Aperçu public du jour ${cell.day} (nouvel onglet)`}
+          className="absolute right-1 bottom-1 z-10 rounded-md p-1 text-muted-foreground/60 transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <Eye className="size-3.5" aria-hidden />
+        </a>
+      ) : null}
+    </div>
   );
 }
 
@@ -181,6 +200,7 @@ function DayCellTile({
 function DayEditorDialog({
   participantId,
   participantName,
+  participantSlug,
   cell,
   stitches,
   yarns,
@@ -188,6 +208,7 @@ function DayEditorDialog({
 }: {
   participantId: number;
   participantName: string;
+  participantSlug: string;
   cell: CalendarDayData;
   stitches: StitchOption[];
   yarns: YarnOption[];
@@ -390,6 +411,14 @@ function DayEditorDialog({
           ) : null}
 
           <DialogFooter className="gap-2 sm:gap-0">
+            <a
+              href={`/cal/${participantSlug}/${cell.day}`}
+              target="_blank"
+              rel="noopener"
+              className="mr-auto inline-flex items-center gap-1.5 self-center rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <Eye className="size-4" aria-hidden /> Aperçu public
+            </a>
             <Button type="button" variant="ghost" onClick={onClose}>
               Annuler
             </Button>

@@ -39,3 +39,10 @@ The page people find when scanning the QR code (or opening the guessable URL).
 - Notes markdown: `react-markdown` + `remark-gfm` (works in RSC), styled from the container with arbitrary-variant selectors (`[&_a]:underline`, `[&_li]:ms-5`, `[&_img]:rounded-lg`…) so no prose plugin is needed; links open in a new tab like the tutorial button. Plain `<img>` allowed for later uploaded photos.
 - `ADVENT_YEAR` moved to shared `src/lib/advent.ts` (also imported by the QR PDF).
 - Verified: 200/404 matrix, markdown → `<h2>/<strong>/<a target=_blank rel=noopener>`, yarn hex swatch, tuto URL, date labels.
+
+## Backoffice preview links (added 2026-10-27)
+
+So the days can be checked without scanning a printed QR:
+- eye icon on each **configured** day tile → opens `/cal/{slug}/{day}` in a new tab (overlay `<a>` above the tile button, same stretched-link pattern as the admin cards);
+- **"Aperçu public"** link in the day editor dialog footer (left-aligned via `mr-auto`);
+- **"Aperçu public"** item in the `/admin` participant card menu (points to day 1; unconfigured days show the friendly not-ready page).
