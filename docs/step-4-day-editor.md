@@ -47,6 +47,8 @@ On `/admin/participants/[slug]`:
 - Live smoke test (dev server + real session cookie): grid renders 25 tiles; every save/validate path exercised through the real actions — fixed stitch rows forced to 4 in DB (submitted "9" ignored), rows 9/1 and day 30 rejected, `javascript:` URL rejected, re-save upserts (rows 4→2 oververified), empty save creates no row, "Vider le jour" deletes it.
 - FK set-null: deleting a yarn leaves the day intact with `yarn_id = NULL` (rows/notes preserved) — requires `foreign_keys = ON`, already set in `src/db/index.ts`. Note: the `sqlite3` CLI does **not** enforce FKs unless the pragma is passed per connection, which can make manual checks misleading.
 
+- Fixed a real-world issue reported right after: browsing the dev server over the LAN IP (`http://192.168.1.188:3000`, e.g. from a phone) made every card/tile unclickable — Next 16 dev blocks cross-origin dev resources when the host isn't in `allowedDevOrigins`, so the page renders but never hydrates. Fix: `allowedDevOrigins: ["192.168.1.188"]` in `next.config.ts` (requires dev-server restart). Diagnosed with a headless Chromium run: full flow (login → participant card → day tile → dialog → save) passed over the LAN IP with zero console errors after the fix.
+
 ## Notes for later steps
 
 - Step 5 (references CRUD) can reuse the dialog patterns; the "create new stitch/yarn inline" affordance mentioned in the brief was deliberately deferred here — selects are existing-lists only.
