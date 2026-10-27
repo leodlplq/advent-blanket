@@ -1,33 +1,27 @@
-# Step 3 — Backoffice shell: participants management 🔜 next
+# Step 3 — Backoffice shell: participants management ✅ done
 
-Goal: turn the `/admin` dashboard stub into working participant management.
+## What was built
 
-## Scope (agreed in session)
+- `src/lib/slug.ts` — `slugify()` (ASCII-fold accents, lowercase, alnum+dashes) and `buildUniqueSlug()` (`base`, `base-2`, …). Slugs are generated **only at creation** and never on rename: they are part of the QR links `/cal/{slug}/{day}`.
+- `src/app/admin/participants/actions.ts` — server actions with `ParticipantActionState { ok?, error? }` shared by add/rename/delete:
+  - `createParticipantAction` — validates name, recomputes slug server-side (never trusts the client), inserts, `revalidatePath("/admin", "layout")`
+  - `renameParticipantAction` — updates `name` **only** (slug untouched, same reason as above)
+  - `deleteParticipantAction` — deletes participant; their `calendar_days` rows cascade (FK)
+- `src/app/admin/participants/participants-manager.tsx` — client component consuming server data:
+  - **Add** button + Dialog ("Ajouter une personne")
+  - Cards with **stretched-link overlay** (whole card clickable → `/admin/participants/[slug]`), dropdown menu (…): Modifier / Supprimer (destructive-styled)
+  - Rename dialog with notice "les QR codes restent valables"; delete dialog shows day count + "définitif" warning
+  - `useActionState` + `useFormStatus` pending labels (French), sonner toasts on success (`useCloseOnSuccess` helper), `<Toaster />` rendered inside the manager
+- `src/app/admin/page.tsx` — loads participants + day counts, passes `{id, name, slug, dayCount}[]` to the manager
+- `src/app/admin/participants/[slug]/page.tsx` — detail placeholder (Back link, name, "x/25 jours configurés", dashed placeholder for the step 4 grid); `notFound()` on unknown slug
 
-- Cards on `/admin` become **clickable links** → `/admin/participants/[slug]` (detail page for one participant's calendar; the 25-day grid itself is step 4 — this page can be a minimal placeholder that step 4 fills).
-- **Add participant** — button "Ajouter une personne" → shadcn `Dialog` with name input; **slug auto-generated** from the French name (ASCII-fold accents, lowercase, non-alnum → `-`). Client generates a preview when typing; server **recomputes** the slug on submit (never trust client) and ensures uniqueness (e.g. slug, slug-2, slug-3…).
-- **Rename participant** — edit entry (dialog or dropdown-menu action on each card) updating `name`.
-- **Delete participation** — destructive action with confirmation dialog; warn that it deletes the participant **and their calendar days** (FK cascade); require typing the name to confirm, or a checkbox — destructive UX is our call, keep it simple but safe. Soft-consider: participants having configured days → wording adapts.
-- Keep the "x/25 jours configurés" count badges on cards.
-- Everything under `requireSession()` (layout already guarantees it).
+## Verified
 
-## Technical notes
+- tsc clean, `pnpm build` green (`/admin/participants/[slug]` dynamic route registered)
+- Live: `/admin` shows "Ajouter une personne" + links `/admin/participants/clemence` and `/leo`; detail page 200; unknown slug → 404
 
-- Use **server actions** in `src/app/admin/participants/actions.ts` ("use server") performing DB writes via drizzle, then `revalidatePath("/admin")` (and detail path if needed).
-- Client dialogs live in a small client component receiving the action + existing participants as props; keep data fetching in the server page.
-- Slug helpers: write once in `src/lib/utils.ts` or `src/lib/slug.ts` (also used later for seeding new participants).
-- Copy in French: "Ajouter une personne", "Modifier", "Supprimer", "Nom", placeholder etc.
-- No confirmation toast needed, but `sonner` is installed if we want feedback.
+## Notes for later steps
 
-## Acceptance criteria
-
-- [ ] From `/admin` I can add Clémence/Léo-like participant with accented name → correct slug, card appears
-- [ ] Rename reflected on the card (and, later, QR label/PDF use the new name)
-- [ ] Delete removes the participant + their days (cascade) after an explicit confirmation
-- [ ] Duplicate names get unique slugs (clemence, clemence-2)
-- [ ] All actions are session-protected (layout + server action)
-
-## Out of scope (later steps)
-
-- The 25-day grid → step 4
-- PDF/QR — step 6
+- Next 16 detail: in the rename/delete dialogs, `key={participant.id}` on the form remounts fields when switching participants.
+- Toaster is scoped inside ParticipantsManager for now — move it to the root layout when more admin pages show toasts.
+- "Clickable card + menu" pattern to reuse: `CardHeader` with a `Link` using `absolute inset-0` overlay, and the menu button wrapper kept at `z-10`.
