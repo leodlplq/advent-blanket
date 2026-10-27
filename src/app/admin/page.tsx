@@ -1,11 +1,9 @@
 import { count } from "drizzle-orm";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { db, schema } from "@/db";
+import {
+  ParticipantsManager,
+  type ParticipantCardData,
+} from "@/app/admin/participants/participants-manager";
 
 export default async function AdminPage() {
   const participants = await db
@@ -25,30 +23,21 @@ export default async function AdminPage() {
     dayCounts.map((entry) => [entry.participantId, entry.dayCount]),
   );
 
+  const data: ParticipantCardData[] = participants.map((participant) => ({
+    id: participant.id,
+    name: participant.name,
+    slug: participant.slug,
+    dayCount: configuredDaysByParticipant.get(participant.id) ?? 0,
+  }));
+
   return (
     <div className="grid gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
           Calendriers de l&apos;Avent
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Sélectionnez une personne pour préparer ses 25 jours.
-        </p>
       </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        {participants.map((participant) => (
-          <Card key={participant.id}>
-            <CardHeader>
-              <CardTitle>{participant.name}</CardTitle>
-              <CardDescription>
-                {configuredDaysByParticipant.get(participant.id) ?? 0}
-                /25 jours configurés
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
+      <ParticipantsManager participants={data} />
     </div>
   );
 }
