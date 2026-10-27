@@ -29,6 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="fr"
       className={`${outfit.variable} ${fraunces.variable} ${geistMono.variable} h-full antialiased`}
+      // Browser extensions / browser features can inject attributes (e.g. a
+      // __gcrremoteframetoken) onto <html> before hydration. React then warns
+      // about a mismatch on every page load. scope it to this element only.
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

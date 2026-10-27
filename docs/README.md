@@ -61,6 +61,7 @@ pnpm start        # prod server (after build)
 - PDF QR codes: set `NEXT_PUBLIC_APP_URL` in production; when unset (dev), QRs encode the requesting host, so LAN testing works (`http://192.168.x.x:3000`).
 - Reset local data: delete `data/advent-blanket.db*` then `pnpm db:seed`.
 - **Next 16 gotchas** (see `src/AGENTS.md`-style note in the repo): Middleware is now `proxy.ts`; `params`/`searchParams` are Promises (`await` them); read bundled docs at `node_modules/next/dist/docs/` before writing non-obvious code.
+- Dev server log: `.next/dev/logs/next-development.log` (browser + server logs land there). Hydration mismatch on `<html>` caused by injected attributes (e.g. `__gcrremoteframetoken` from a browser extension) is silenced via `suppressHydrationWarning` on `<html>` in `src/app/layout.tsx` — keep it element-scoped.
 - pnpm only runs postinstall scripts listed in `package.json` → `pnpm.onlyBuiltDependencies` includes `better-sqlite3` and `esbuild`.
 - Files: DB `src/db/{index,schema,seed}.ts`, auth `src/lib/{auth,session}.ts`, UI components `src/components/ui/*`.
 
