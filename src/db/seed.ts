@@ -1,4 +1,3 @@
-import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { db, schema } from "./index";
@@ -10,10 +9,14 @@ import { db, schema } from "./index";
  * - a few starter stitches and yarns
  *
  * Calendar days stay empty: the backoffice is meant to fill them.
- * Run with: pnpm db:seed
+ *
+ * Imported by:
+ * - scripts/seed.ts (CLI: pnpm db:seed, loads dotenv first)
+ * - src/instrumentation.ts (runs once at production server start, so a
+ *   fresh deployment bootstraps its own admin — no manual seed step)
  */
 
-async function seed() {
+export async function runSeed(): Promise<void> {
   // --- Admin ------------------------------------------------------------
   const username = process.env.ADMIN_USERNAME ?? "admin";
   const password = process.env.ADMIN_PASSWORD ?? "avent2026";
@@ -95,10 +98,3 @@ async function seed() {
 
   console.log("Seed done.");
 }
-
-seed()
-  .catch((error) => {
-    console.error("Seed failed:", error);
-    process.exitCode = 1;
-  })
-  .then(() => process.exit(process.exitCode ?? 0));

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
@@ -22,6 +22,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Advent Blanket",
   description: "Calendrier de l'Avent au crochet : le point et la pelotte du jour.",
+};
+
+// Mobile browser chrome tinted with the app red (matches src/app/icon.svg).
+export const viewport: Viewport = {
+  themeColor: "#b0413e",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

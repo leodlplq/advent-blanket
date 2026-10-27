@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
-    "db:seed": "tsx src/db/seed.ts"
+    "db:seed": "tsx scripts/seed.ts",
+    "db:backup": "node scripts/backup.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
