@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
-import { EllipsisVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { EllipsisVertical, FileDown, Pencil, Plus, Trash2 } from "lucide-react";
 import {
   Card,
   CardDescription,
@@ -118,6 +118,11 @@ export function ParticipantsManager({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <a href={`/api/pdf/${participant.slug}`} download>
+                      <FileDown aria-hidden /> Imprimer les QR codes
+                    </a>
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setRenameTarget(participant)}>
                     <Pencil aria-hidden /> Modifier
                   </DropdownMenuItem>

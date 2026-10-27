@@ -41,7 +41,7 @@ Original brief was in French (see repo history), summarizes: per-day she sees st
 | 3 | Backoffice shell: participants management | ✅ done |
 | 4 | Calendar grid + day editor modal | ✅ done |
 | 5 | References management (stitches, yarns) | ✅ done |
-| 6 | QR codes + printable PDF | ⬜ todo |
+| 6 | QR codes + printable PDF | ✅ done |
 | 7 | Public day page `/cal/[slug]/[day]` | ⬜ todo |
 | 8 | Polish + Coolify deployment | ⬜ todo |
 
@@ -58,6 +58,7 @@ pnpm start        # prod server (after build)
 ```
 
 - Default admin: `admin` / `avent2026` (override with `ADMIN_USERNAME` / `ADMIN_PASSWORD`, see `.env.example`). Set `SESSION_SECRET` in production.
+- PDF QR codes: set `NEXT_PUBLIC_APP_URL` in production; when unset (dev), QRs encode the requesting host, so LAN testing works (`http://192.168.x.x:3000`).
 - Reset local data: delete `data/advent-blanket.db*` then `pnpm db:seed`.
 - **Next 16 gotchas** (see `src/AGENTS.md`-style note in the repo): Middleware is now `proxy.ts`; `params`/`searchParams` are Promises (`await` them); read bundled docs at `node_modules/next/dist/docs/` before writing non-obvious code.
 - pnpm only runs postinstall scripts listed in `package.json` → `pnpm.onlyBuiltDependencies` includes `better-sqlite3` and `esbuild`.

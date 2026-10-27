@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { count, eq } from "drizzle-orm";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { db, schema } from "@/db";
 import { notFound } from "next/navigation";
@@ -95,12 +95,22 @@ export default async function ParticipantPage({
             <ArrowLeft aria-hidden /> Calendriers
           </Link>
         </Button>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {participant.name}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {dayCount}/25 jours configurés
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              {participant.name}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {dayCount}/25 jours configurés
+            </p>
+          </div>
+          {/* Printable A4 sheet with the 25 labeled QR codes. */}
+          <Button asChild variant="outline" size="sm">
+            <a href={`/api/pdf/${participant.slug}`} download>
+              <Download aria-hidden /> PDF des QR codes
+            </a>
+          </Button>
+        </div>
       </div>
 
       {/* The 25-day grid; clicking a cell opens the day editor dialog. */}
