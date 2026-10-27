@@ -42,7 +42,7 @@ Original brief was in French (see repo history), summarizes: per-day she sees st
 | 4 | Calendar grid + day editor modal | ✅ done |
 | 5 | References management (stitches, yarns) | ✅ done |
 | 6 | QR codes + printable PDF | ✅ done |
-| 7 | Public day page `/cal/[slug]/[day]` | ⬜ todo |
+| 7 | Public day page `/cal/[slug]/[day]` | ✅ done |
 | 8 | Polish + Coolify deployment | ⬜ todo |
 
 One file per step in this folder: `step-<n>-<slug>.md`. Update the status line in the table above and the step file when starting/finishing a step.

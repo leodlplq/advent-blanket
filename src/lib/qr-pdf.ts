@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import QRCode from "qrcode";
+import { ADVENT_YEAR } from "./advent";
 
 /**
  * A4 printable sheet: 25 labeled QR codes (one per December day) in a
@@ -18,9 +19,7 @@ import QRCode from "qrcode";
  *   day number + date → unambiguous mapping.
  */
 
-// The app targets the 2026 Advent; kept as a single constant until a
-// year-aware configuration exists.
-const ADVENT_YEAR = 2026;
+// Shared constant; see src/lib/advent.ts.
 
 // A4 in points.
 const PAGE_WIDTH = 595.28;
