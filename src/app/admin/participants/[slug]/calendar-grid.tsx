@@ -7,7 +7,7 @@ import {
   useTransition,
 } from "react";
 import { useFormStatus } from "react-dom";
-import { Check } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +32,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import { clearDayAction, saveDayAction, type DayActionState } from "../days";
+import { quickCreateStitchAction, quickCreateYarnAction } from "../../references/actions";
 
 /**
  * 25-day calendar grid for one participant, with a day editor dialog.
@@ -200,16 +202,40 @@ function DayEditorDialog({
     cell.rows != null ? String(cell.rows) : "",
   );
 
+  // Local copies of the reference lists: quick-created entities are appended
+  // here (and auto-selected) without closing the day editor.
+  const [stitchList, setStitchList] = useState(stitches);
+  const [yarnList, setYarnList] = useState(yarns);
+
+  const handleStitchCreated = (option: StitchOption) => {
+    setStitchList((list) =>
+      list.some((item) => item.id === option.id)
+        ? list
+        : [...list, option].sort((a, b) =>
+            a.name.localeCompare(b.name, "fr"),
+          ),
+    );
+    setStitchId(option.id);
+  };
+
+  const handleYarnCreated = (option: YarnOption) => {
+    setYarnList((list) =>
+      list.some((item) => item.id === option.id)
+        ? list
+        : [...list, option].sort((a, b) =>
+            a.name.localeCompare(b.name, "fr"),
+          ),
+    );
+    setYarnId(option.id);
+  };
+
   const selectedStitch =
-    stitchId != null ? stitches.find((s) => s.id === stitchId) ?? null : null;
+    stitchId != null ? stitchList.find((s) => s.id === stitchId) ?? null : null;
   const fixedRows = selectedStitch?.fixedRows ?? null;
 
-  // Lock the value to the stitch-imposed one as soon as a fixed stitch is selected.
-  useEffect(() => {
-    if (fixedRows != null) {
-      setRows(String(fixedRows));
-    }
-  }, [fixedRows]);
+  // The rows lock works purely through the value prop: when the stitch
+  // imposes fixed_rows the input is disabled and displays that value, so
+  // nothing is submitted from stale local state.
 
   // Close + toast once the save action reports success.
   useEffect(() => {
@@ -251,7 +277,10 @@ function DayEditorDialog({
 
           {/* Point -------------------------------------------------------- */}
           <div className="grid gap-2">
-            <Label htmlFor="stitch">Point</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="stitch">Point</Label>
+              <QuickCreateStitchDialog onCreated={handleStitchCreated} />
+            </div>
             <Select
               name="stitchId"
               value={stitchId != null ? String(stitchId) : ""}
@@ -261,7 +290,7 @@ function DayEditorDialog({
                 <SelectValue placeholder="—" />
               </SelectTrigger>
               <SelectContent>
-                {stitches.map((stitch) => (
+                {stitchList.map((stitch) => (
                   <SelectItem key={stitch.id} value={String(stitch.id)}>
                     {stitch.name}
                     {stitch.fixedRows != null
@@ -275,7 +304,10 @@ function DayEditorDialog({
 
           {/* Pelotte ------------------------------------------------------ */}
           <div className="grid gap-2">
-            <Label htmlFor="yarn">Pelotte</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="yarn">Pelotte</Label>
+              <QuickCreateYarnDialog onCreated={handleYarnCreated} />
+            </div>
             <Select
               name="yarnId"
               value={yarnId != null ? String(yarnId) : ""}
@@ -285,7 +317,7 @@ function DayEditorDialog({
                 <SelectValue placeholder="—" />
               </SelectTrigger>
               <SelectContent>
-                {yarns.map((yarn) => (
+                {yarnList.map((yarn) => (
                   <SelectItem key={yarn.id} value={String(yarn.id)}>
                     <span className="flex items-center gap-2">
                       <span
@@ -386,5 +418,168 @@ function SaveButton() {
     <Button type="submit" disabled={pending}>
       {pending ? "Enregistrement…" : "Enregistrer"}
     </Button>
+  );
+}
+
+// --- Quick-create dialogs ------------------------------------------------------
+// Small nested dialogs spawning from the day editor. On success the new
+// option is handed back (complete: name + fixedRows / colorHex) and
+// auto-selected; the day editor stays open.
+
+function QuickCreateStitchDialog({
+  onCreated,
+}: {
+  onCreated: (option: StitchOption) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [fixedRows, setFixedRows] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const name = String(new FormData(form).get("name") ?? "").trim();
+    const rows = fixedRows.trim() === "" ? null : Number(fixedRows);
+
+    startTransition(async () => {
+      const result = await quickCreateStitchAction(name, rows);
+      if (result.ok && result.id != null) {
+        onCreated({ id: result.id, name, fixedRows: rows });
+        setOpen(false);
+        setFixedRows("");
+        toast.success(`Point « ${name} » ajouté et sélectionné.`);
+      } else {
+        toast.error(result.error ?? "Échec de la création.");
+      }
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+          <Plus aria-hidden /> Nouveau
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Nouveau point</DialogTitle>
+          <DialogDescription>
+            Il sera ajouté à la liste pour tous les calendriers.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="quick-stitch-name">Nom</Label>
+            <Input
+              id="quick-stitch-name"
+              name="name"
+              autoFocus
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="quick-stitch-rows">Rangs imposés</Label>
+            <Input
+              id="quick-stitch-rows"
+              type="number"
+              inputMode="numeric"
+              min={2}
+              max={5}
+              value={fixedRows}
+              onChange={(event) => setFixedRows(event.target.value)}
+              placeholder="2 à 5"
+            />
+            <p className="text-xs text-muted-foreground">
+              Laisser vide pour laisser le choix entre 2 et 5 rangs.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Ajout…" : "Ajouter"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function QuickCreateYarnDialog({
+  onCreated,
+}: {
+  onCreated: (option: YarnOption) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [color, setColor] = useState("#cccccc");
+  const [isPending, startTransition] = useTransition();
+
+  const safeColor = /^#[0-9a-f]{6}$/i.test(color) ? color : "#cccccc";
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const name = String(new FormData(event.currentTarget).get("name") ?? "").trim();
+
+    startTransition(async () => {
+      const result = await quickCreateYarnAction(name, safeColor);
+      if (result.ok && result.id != null) {
+        onCreated({ id: result.id, name, colorHex: safeColor });
+        setOpen(false);
+        setColor("#cccccc");
+        toast.success(`Pelotte « ${name} » ajoutée et sélectionnée.`);
+      } else {
+        toast.error(result.error ?? "Échec de la création.");
+      }
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+          <Plus aria-hidden /> Nouvelle
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Nouvelle pelotte</DialogTitle>
+          <DialogDescription>
+            Elle sera ajoutée à la liste pour tous les calendriers.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="quick-yarn-name">Nom</Label>
+            <Input
+              id="quick-yarn-name"
+              name="name"
+              autoFocus
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="quick-yarn-color">Couleur</Label>
+            <div className="flex items-center gap-2">
+              <input
+                id="quick-yarn-color"
+                type="color"
+                aria-label="Choisir la couleur"
+                value={safeColor}
+                onChange={(event) => setColor(event.target.value)}
+                className="size-9 shrink-0 cursor-pointer rounded-md border bg-transparent p-0.5"
+              />
+              <span className="font-mono text-sm text-muted-foreground">
+                {safeColor}
+              </span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Ajout…" : "Ajouter"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

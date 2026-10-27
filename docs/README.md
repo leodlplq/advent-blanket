@@ -40,7 +40,7 @@ Original brief was in French (see repo history), summarizes: per-day she sees st
 | 2 | Authentication (login, session, proxy guard) | ✅ done |
 | 3 | Backoffice shell: participants management | ✅ done |
 | 4 | Calendar grid + day editor modal | ✅ done |
-| 5 | References management (stitches, yarns) | ⬜ todo |
+| 5 | References management (stitches, yarns) | ✅ done |
 | 6 | QR codes + printable PDF | ⬜ todo |
 | 7 | Public day page `/cal/[slug]/[day]` | ⬜ todo |
 | 8 | Polish + Coolify deployment | ⬜ todo |
