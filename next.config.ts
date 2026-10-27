@@ -1,10 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // DB-backed pages with cookie auth: use the classic dynamic rendering model.
+  cacheComponents: false,
   turbopack: {
+
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],

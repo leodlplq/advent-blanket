@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1793120236926,
+      "tag": "0000_smart_moira_mactaggert",
+      "breakpoints": true
+    }
+  ]
+}
