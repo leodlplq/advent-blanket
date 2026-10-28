@@ -35,7 +35,7 @@ import { clearDayAction, saveDayAction, type DayActionState } from "../days";
 import { quickCreateStitchAction, quickCreateYarnAction } from "../../references/actions";
 
 /**
- * 25-day calendar grid for one participant, with a day editor dialog.
+ * 24-day calendar grid for one participant, with a day editor dialog.
  * The rows field is locked when the selected stitch imposes `fixed_rows`.
  */
 

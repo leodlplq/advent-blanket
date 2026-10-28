@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getSession } from "@/lib/auth";
+import { ADVENT_DAYS } from "@/lib/advent";
 import {
   generateCalendarQrPdf,
   normalizeBaseUrl,
@@ -8,7 +9,7 @@ import {
 } from "@/lib/qr-pdf";
 
 /**
- * Printable A4 sheet with the 25 labeled QR codes for one participant.
+ * Printable A4 sheet with the 24 labeled QR codes for one participant.
  *
  * Only authenticated backoffice users can generate it (the proxy matcher
  * doesn't cover /api/*, so the session is verified here). The PDF itself is
@@ -45,7 +46,7 @@ export async function GET(
     .where(eq(schema.calendarDays.participantId, participant.id));
   const configuredDays = new Set(dayRows.map((row) => row.day));
 
-  const days: QrDayData[] = Array.from({ length: 25 }, (_, index) => ({
+  const days: QrDayData[] = Array.from({ length: ADVENT_DAYS }, (_, index) => ({
     day: index + 1,
     configured: configuredDays.has(index + 1),
   }));

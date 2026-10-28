@@ -51,7 +51,7 @@ export const yarns = sqliteTable("yarns", {
     .default(timestampNow),
 });
 
-// One entry per participant per day (1–25 December).
+// One entry per participant per day (1–24 December).
 // All fields are optional so a day can be prepared incrementally.
 export const calendarDays = sqliteTable(
   "calendar_days",
@@ -60,7 +60,7 @@ export const calendarDays = sqliteTable(
     participantId: integer("participant_id")
       .notNull()
       .references(() => participants.id, { onDelete: "cascade" }),
-    day: integer("day").notNull(), // 1–25
+    day: integer("day").notNull(), // 1–24
     stitchId: integer("stitch_id").references(() => stitches.id, {
       onDelete: "set null",
     }),

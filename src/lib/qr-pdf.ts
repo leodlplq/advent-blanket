@@ -1,17 +1,17 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import QRCode from "qrcode";
-import { ADVENT_YEAR } from "./advent";
+import { ADVENT_DAYS, ADVENT_YEAR } from "./advent";
 
 /**
- * A4 printable sheet: 25 labeled QR codes (one per December day) in a
- * scissor-friendly 5×5 grid.
+ * A4 printable sheet: 24 labeled QR codes (one per December day) in a
+ * scissor-friendly 4×6 grid.
  *
  * Text uses the standard Helvetica fonts (WinAnsi encoding covers the
  * French accents we need). QR images are generated as PNG buffers with
  * `qrcode` before being embedded.
  *
  * Structure/format decisions:
- * - portrait A4, 5×5 grid, each cell = dashed border (cut line) containing
+ * - portrait A4, 4×6 grid, each cell = dashed border (cut line) containing
  *   the QR code on top and its label ("Jour N — N décembre") underneath;
  * - days that are not configured yet get a grayed-out placeholder cell
  *   ("Non configuré") so the missing prep is visible at a glance;
@@ -30,8 +30,8 @@ const MARGIN = 34;
 const GRID_GAP = 9;
 const HEADER_HEIGHT = 62;
 
-const GRID_COLS = 5;
-const GRID_ROWS = 5;
+const GRID_COLS = 4;
+const GRID_ROWS = Math.ceil(ADVENT_DAYS / GRID_COLS);
 
 const CELL_WIDTH =
   (PAGE_WIDTH - MARGIN * 2 - GRID_GAP * (GRID_COLS - 1)) / GRID_COLS;
@@ -102,7 +102,7 @@ export async function generateCalendarQrPdf(
 
   // --- Grid cells ------------------------------------------------------------
 
-  for (let index = 0; index < GRID_COLS * GRID_ROWS; index += 1) {
+  for (let index = 0; index < ADVENT_DAYS; index += 1) {
     const day = index + 1;
     const dayData =
       input.days.find((entry) => entry.day === day) ?? { day, configured: false };

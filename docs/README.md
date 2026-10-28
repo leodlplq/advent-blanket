@@ -4,12 +4,12 @@ Documentation written in **English** so any session (human or AI) can pick up th
 
 ## What the app is
 
-A website for the **2026 Advent crochet blanket** (inspired by the "chaos blanket" concept). For each day from **December 1 to 25**, each participant (started with **Clémence** and **Léo**) must crochet a row set (2–5 rows) using a randomly-chosen **crochet stitch** and a **yarn ball**. At the end of the month the 25 pieces are assembled into a blanket.
+A website for the **2026 Advent crochet blanket** (inspired by the "chaos blanket" concept). For each day from **December 1 to 24**, each participant (started with **Clémence** and **Léo**) must crochet a row set (2–5 rows) using a randomly-chosen **crochet stitch** and a **yarn ball**. At the end of the month the 24 pieces are assembled into a blanket.
 
 The app provides:
 
-- a **backoffice** (single shared login, extensible to more users) to configure, per participant, the stitch / yarn / rows / tutorial link for each of the 25 days, plus optional notes;
-- **PDF export** per participant: one A4 sheet with **25 QR codes**, each clearly labeled with its date + participant name, to be printed and hidden as daily gifts;
+- a **backoffice** (single shared login, extensible to more users) to configure, per participant, the stitch / yarn / rows / tutorial link for each of the 24 days, plus optional notes;
+- **PDF export** per participant: one A4 sheet with **24 QR codes**, each clearly labeled with its date + participant name, to be printed and hidden as daily gifts;
 - a **public mobile-first page** per day (opened via the scanned QR code): stitch to do, number of rows (highlighted), yarn + color dot, tutorial link button, notes.
 
 ## Ownership & key decisions
@@ -30,7 +30,7 @@ The app provides:
 | PDF/QR (later) | `qrcode` + `pdf-lib`, server-side |
 | Fonts | Outfit (body/UI), Fraunces (headings), Geist Mono (mono) — via `next/font/google` |
 
-Original brief was in French (see repo history), summarizes: per-day she sees stitch → text/list, tutorial link (TikTok etc., must deep-link into the mobile app), yarn → fixed list of names, rows 2–5 with **some stitches having an exact imposed rows count**. Backoffice: login, one shared account for both calendars, per-participant 25-day grid editable via modal, markdown-ish content with photos/text/links, printable QR PDF. Public site: simple, readable on phone, driven by the scanned link.
+Original brief was in French (see repo history), summarizes: per-day she sees stitch → text/list, tutorial link (TikTok etc., must deep-link into the mobile app), yarn → fixed list of names, rows 2–5 with **some stitches having an exact imposed rows count**. Backoffice: login, one shared account for both calendars, per-participant 24-day grid editable via modal, markdown-ish content with photos/text/links, printable QR PDF. Public site: simple, readable on phone, driven by the scanned link.
 
 ## Progress
 

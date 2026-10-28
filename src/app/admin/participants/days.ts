@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { ADVENT_DAYS } from "@/lib/advent";
 
 /**
  * Calendar day actions (save / clear).
@@ -35,7 +36,7 @@ export async function saveDayAction(
   if (!participantId) {
     return { error: "Participant inconnu." };
   }
-  if (!Number.isInteger(day) || day < 1 || day > 25) {
+  if (!Number.isInteger(day) || day < 1 || day > ADVENT_DAYS) {
     return { error: "Jour invalide." };
   }
 
@@ -130,7 +131,7 @@ export async function clearDayAction(
   if (!Number.isInteger(participantId) || participantId <= 0) {
     return { error: "Participant inconnu." };
   }
-  if (!Number.isInteger(day) || day < 1 || day > 25) {
+  if (!Number.isInteger(day) || day < 1 || day > ADVENT_DAYS) {
     return { error: "Jour invalide." };
   }
 

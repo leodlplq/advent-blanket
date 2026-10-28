@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import { Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { db, schema } from "@/db";
-import { ADVENT_YEAR } from "@/lib/advent";
+import { ADVENT_DAYS, ADVENT_YEAR } from "@/lib/advent";
 
 /**
  * Public day page, the landing for the printed QR codes:
@@ -105,10 +105,10 @@ export async function generateMetadata({
   };
 }
 
-/** Day URL path segment → 1–25, or null (→ 404). */
+/** Day URL path segment → 1–24, or null (→ 404). */
 function parseDayParam(raw: string): number | null {
   const day = Number(raw);
-  return Number.isInteger(day) && day >= 1 && day <= 25 ? day : null;
+  return Number.isInteger(day) && day >= 1 && day <= ADVENT_DAYS ? day : null;
 }
 
 export default async function PublicDayPage({
@@ -119,7 +119,7 @@ export default async function PublicDayPage({
   const { slug, day: dayParam } = await params;
   const day = parseDayParam(dayParam);
 
-  // Unknown participant OR invalid day (0, 26+, "abc", injection attempts).
+  // Unknown participant OR invalid day (0, 25+, "abc", injection attempts).
   if (day === null) notFound();
   const loaded = await loadDay(slug, day);
   if (!loaded) notFound();
@@ -256,7 +256,7 @@ function DayShell({
       <main className="mx-auto flex w-full max-w-md flex-col gap-7 px-5 pt-10 pb-14">
         <header className="text-center">
           <p className="text-xs font-medium tracking-widest text-muted-foreground uppercase">
-            Jour {day} sur 25 · {dayDate(day)} {ADVENT_YEAR}
+            Jour {day} sur {ADVENT_DAYS} · {dayDate(day)} {ADVENT_YEAR}
           </p>
           <h1 className="mt-1 font-heading text-3xl font-semibold tracking-tight">
             {participantName}
@@ -264,7 +264,7 @@ function DayShell({
         </header>
         {children}
         <p className="mt-auto pt-4 text-center text-xs text-muted-foreground">
-          ✨ Calendrier de l&apos;Avent au crochet — un point, une pelotte, 25 jours
+          ✨ Calendrier de l&apos;Avent au crochet — un point, une pelotte, {ADVENT_DAYS} jours
         </p>
       </main>
     </div>

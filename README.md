@@ -2,7 +2,7 @@
 
 Calendrier de l'Avent au crochet : chaque jour de décembre, la personne en
 charge du jour révèle **le point du jour, le nombre de rangs et la pelotte**,
-avec un lien vers le tuto. Les 25 jours s'étiquettent avec un PDF de QR codes
+avec un lien vers le tuto. Les 24 jours s'étiquettent avec un PDF de QR codes
 à découper, et chaque QR ouvre la page publique du jour sur le téléphone.
 
 Stack : Next.js (App Router) · React 19 · Drizzle + SQLite (`better-sqlite3`,
@@ -15,7 +15,7 @@ WAL) · Tailwind 4 / shadcn / sonner · `pdf-lib` + `qrcode`.
 - `docs/step-3-participants.md` — participants et slugs
 - `docs/step-4-day-editor.md` — éditeur de jour (backoffice)
 - `docs/step-5-references.md` — points et pelottes
-- `docs/step-6-pdf-qr.md` — PDF des 25 QR codes
+- `docs/step-6-pdf-qr.md` — PDF des 24 QR codes
 - `docs/step-7-public-page.md` — page publique `/cal/{slug}/{jour}`
 - `docs/step-8-deploy.md` — déploiement Coolify + sauvegardes
 

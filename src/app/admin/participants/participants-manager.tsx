@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { ADVENT_DAYS } from "@/lib/advent";
 import {
   createParticipantAction,
   deleteParticipantAction,
@@ -83,7 +84,7 @@ export function ParticipantsManager({
     <>
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
-          Sélectionnez une personne pour préparer ses 25 jours.
+          Sélectionnez une personne pour préparer ses {ADVENT_DAYS} jours.
         </p>
         <Button onClick={() => setAddOpen(true)} size="sm">
           <Plus aria-hidden /> Ajouter une personne
@@ -103,7 +104,7 @@ export function ParticipantsManager({
               />
               <CardTitle>{participant.name}</CardTitle>
               <CardDescription className="mt-1.5">
-                {participant.dayCount}/25 jours configurés
+                {participant.dayCount}/{ADVENT_DAYS} jours configurés
               </CardDescription>
             </CardHeader>
             <div className="absolute top-3 right-3 z-10">
@@ -198,7 +199,7 @@ function AddParticipantDialog({
         <DialogHeader>
           <DialogTitle>Ajouter une personne</DialogTitle>
           <DialogDescription>
-            Un calendrier de 25 jours sera créé pour cette personne.
+            Un calendrier de {ADVENT_DAYS} jours sera créé pour cette personne.
           </DialogDescription>
         </DialogHeader>
         <form action={formAction} className="grid gap-4">

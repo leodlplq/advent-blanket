@@ -3,6 +3,7 @@ import { count, eq } from "drizzle-orm";
 import { ArrowLeft, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { db, schema } from "@/db";
+import { ADVENT_DAYS } from "@/lib/advent";
 import { notFound } from "next/navigation";
 import {
   CalendarGrid,
@@ -31,14 +32,14 @@ export default async function ParticipantPage({
     .from(schema.calendarDays)
     .where(eq(schema.calendarDays.participantId, participant.id));
 
-  // Days existing in DB + placeholder cells for the always-present 25 slots.
+  // Days existing in DB + placeholder cells for the always-present 24 slots.
   const dayRows = await db
     .select()
     .from(schema.calendarDays)
     .where(eq(schema.calendarDays.participantId, participant.id))
     .orderBy(schema.calendarDays.day);
   const dayByNumber = new Map(dayRows.map((row) => [row.day, row]));
-  const cells: CalendarDayData[] = Array.from({ length: 25 }, (_, index) => {
+  const cells: CalendarDayData[] = Array.from({ length: ADVENT_DAYS }, (_, index) => {
     const day = index + 1;
     const row = dayByNumber.get(day);
     return row
@@ -101,10 +102,10 @@ export default async function ParticipantPage({
               {participant.name}
             </h1>
             <p className="text-sm text-muted-foreground">
-              {dayCount}/25 jours configurés
+              {dayCount}/{ADVENT_DAYS} jours configurés
             </p>
           </div>
-          {/* Printable A4 sheet with the 25 labeled QR codes. */}
+          {/* Printable A4 sheet with the 24 labeled QR codes. */}
           <Button asChild variant="outline" size="sm">
             <a href={`/api/pdf/${participant.slug}`} download>
               <Download aria-hidden /> PDF des QR codes
@@ -113,7 +114,7 @@ export default async function ParticipantPage({
         </div>
       </div>
 
-      {/* The 25-day grid; clicking a cell opens the day editor dialog. */}
+      {/* The 24-day grid; clicking a cell opens the day editor dialog. */}
       <CalendarGrid
         participantId={participant.id}
         participantName={participant.name}
